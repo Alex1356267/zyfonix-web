@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZYFONIX | Video Editor pre tvorcov a influencerov</title>
+<meta name="description" content="Video editor pre CZ/SK YouTuberov a influencerov. Dynamický strih, ktorý drží divákov pri obrazovke – YouTube, Shorts, Reels a TikTok.">
+<meta name="theme-color" content="#070709">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ZYFONIX | Video Editor pre tvorcov">
+<meta property="og:description" content="Strih, ktorý udrží divákov pri obrazovke. 781K+ videní, 1.5M+ dosah klientov.">
+<meta property="og:image" content="https://zyfonix.eu/assets/og.jpg">
+<meta property="og:url" content="https://zyfonix.eu/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@700;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070709;--surface:#0f0f13;--surface-2:#16161b;--line:rgba(255,255,255,.08);--line-2:rgba(255,255,255,.14);
+  --text:#f4f4f6;--muted:#9b9ba8;--dim:#6b6b78;--green:#22c55e;
+  --chrome:linear-gradient(180deg,#cfcfd6 0%,#fff 42%,#ececf0 50%,#a9a9b4 57%,#e6e6ec 100%);
+  --radius:22px;--max:1180px;
+  --f-display:"Orbitron",sans-serif;--f-head:"Space Grotesk",sans-serif;--f-body:"Inter",system-ui,sans-serif;--f-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:96px}
+body{background:var(--bg);color:var(--text);font-family:var(--f-body);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img,video{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+::selection{background:#fff;color:#000}
+
+/* pozadie – mriežka + svetlá */
+.bg{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.bg-grid{position:absolute;inset:0;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:64px 64px;opacity:.5;
+  mask-image:radial-gradient(ellipse 70% 60% at 50% 30%,#000 20%,transparent 75%);-webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 30%,#000 20%,transparent 75%)}
+.bg-glow{position:absolute;width:900px;height:900px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.07),transparent 65%);top:-300px;left:50%;transform:translateX(-50%);animation:drift 18s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translateX(-30%) translateY(80px)}}
+
+.wrap{width:min(var(--max),100% - 32px);margin-inline:auto}
+section{padding:110px 0}
+.chrome{background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+.eyebrow{font-family:var(--f-mono);font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.h2{font-family:var(--f-head);font-weight:700;font-size:clamp(34px,5vw,56px);line-height:1.08;letter-spacing:-.02em;margin:14px 0 16px}
+.lead{color:var(--muted);font-size:18px;max-width:620px}
+.sec-head{text-align:center;display:flex;flex-direction:column;align-items:center;margin-bottom:56px}
+
+/* tlačidlá */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:56px;padding:0 28px;border-radius:999px;font-family:var(--f-head);font-weight:600;font-size:17px;transition:transform .2s,box-shadow .2s,background .2s,border-color .2s;white-space:nowrap}
+.btn-primary{background:var(--chrome);color:#0a0a0c;box-shadow:0 0 0 1px rgba(255,255,255,.2),0 10px 40px -10px rgba(255,255,255,.35)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 0 1px rgba(255,255,255,.3),0 16px 50px -10px rgba(255,255,255,.5)}
+.btn-ghost{border:1px solid var(--line-2);background:rgba(255,255,255,.03)}
+.btn-ghost:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.25)}
+.btn:focus-visible,a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+/* navigácia */
+.nav{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:50;width:min(var(--max),100% - 32px);
+  display:flex;align-items:center;justify-content:space-between;gap:16px;height:68px;padding:0 10px 0 22px;border-radius:999px;
+  background:rgba(12,12,15,.7);border:1px solid var(--line);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.logo{display:flex;align-items:center;gap:12px;font-family:var(--f-display);font-weight:900;font-size:20px;letter-spacing:.06em}
+.logo-mark{width:34px;height:34px;border-radius:9px;background:var(--chrome);display:grid;place-items:center;color:#0d0d10;font-size:18px}
+.nav-links{display:flex;gap:4px}
+.nav-links a{padding:9px 14px;border-radius:999px;font-size:15px;color:var(--muted);transition:color .2s,background .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--text);background:rgba(255,255,255,.06)}
+.nav .btn{height:48px;padding:0 20px;font-size:15px}
+.burger{display:none;width:48px;height:48px;border-radius:50%;border:1px solid var(--line-2)}
+.burger span{display:block;width:18px;height:2px;background:#fff;margin:4px auto;transition:transform .25s,opacity .25s}
+.nav.open .burger span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.nav.open .burger span:nth-child(2){opacity:0}
+.nav.open .burger span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+
+/* hero */
+.hero{padding:170px 0 40px;text-align:center}
+.status{display:inline-flex;align-items:center;gap:12px;padding:10px 20px;border-radius:999px;border:1px solid var(--line-2);background:rgba(255,255,255,.03);font-family:var(--f-mono);font-size:14px;color:#d6d6de}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(34,197,94,.6);animation:pulse 2s infinite;flex:none}
+@keyframes pulse{70%{box-shadow:0 0 0 10px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.hero h1{font-family:var(--f-display);font-weight:900;font-size:clamp(56px,13vw,150px);line-height:1;letter-spacing:.02em;margin:34px 0 18px;filter:drop-shadow(0 0 40px rgba(255,255,255,.18))}
+.hero .role{font-family:var(--f-head);font-size:clamp(20px,2.6vw,28px);font-weight:500;color:var(--muted)}
+.hero .role b{color:var(--text);font-weight:600}
+.hero p.desc{max-width:640px;margin:22px auto 36px;color:var(--muted);font-size:18px}
+.hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.chips{display:flex;gap:28px;justify-content:center;flex-wrap:wrap;margin-top:40px;font-family:var(--f-mono);font-size:14px;color:var(--muted)}
+.chips b{color:var(--text);font-weight:500}
+
+/* showreel */
+.reel{padding:50px 0 30px}
+.reel-frame{position:relative;border-radius:28px;padding:10px;background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.03));box-shadow:0 40px 120px -40px rgba(255,255,255,.18)}
+.reel-frame video{width:100%;aspect-ratio:16/9;border-radius:20px;background:#000;object-fit:cover}
+.reel-ctrl{position:absolute;right:28px;bottom:28px;display:flex;gap:10px}
+.reel-ctrl button{height:44px;padding:0 18px;border-radius:999px;background:rgba(10,10,12,.7);border:1px solid var(--line-2);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-family:var(--f-head);font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px}
+.reel-ctrl button:hover{background:rgba(30,30,36,.85)}
+
+/* klienti marquee */
+.trust{padding:70px 0 40px}
+.trust .eyebrow{text-align:center;margin-bottom:26px}
+.marquee{overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.marquee-track{display:flex;gap:16px;width:max-content;animation:scroll 38s linear infinite}
+.marquee:hover .marquee-track{animation-play-state:paused}
+@keyframes scroll{to{transform:translateX(calc(-50% - 8px))}}
+.pill{display:flex;align-items:center;gap:14px;padding:8px 22px 8px 8px;border-radius:999px;background:var(--surface);border:1px solid var(--line);transition:border-color .2s,background .2s}
+.pill:hover{border-color:var(--line-2);background:var(--surface-2)}
+.pill img{width:48px;height:48px;border-radius:50%;box-shadow:0 0 0 2px rgba(255,255,255,.25)}
+.pill b{font-family:var(--f-head);font-weight:600;font-size:17px;white-space:nowrap}
+.pill span{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+
+/* o mne */
+.about-grid{display:grid;grid-template-columns:400px 1fr;gap:56px;align-items:center}
+.me{position:relative;border-radius:var(--radius);padding:36px;background:var(--surface);border:1px solid var(--line);text-align:center;overflow:hidden}
+.me::before{content:"";position:absolute;inset:-40% -40% auto;height:80%;background:radial-gradient(circle,rgba(56,130,255,.28),transparent 60%);pointer-events:none}
+.me img{position:relative;width:200px;height:200px;border-radius:50%;margin:0 auto 22px;box-shadow:0 0 0 3px rgba(255,255,255,.18),0 20px 60px -10px rgba(56,130,255,.5)}
+.me h3{font-family:var(--f-display);font-weight:900;font-size:26px;letter-spacing:.05em}
+.me .sub{color:var(--muted);margin:4px 0 22px}
+.tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.tag{font-family:var(--f-mono);font-size:12.5px;padding:7px 12px;border-radius:999px;border:1px solid var(--line-2);color:#d4d4dc}
+.about-text p{color:var(--muted);font-size:17.5px;margin-bottom:16px}
+.about-text p b{color:var(--text);font-weight:600}
+.bullets{list-style:none;display:grid;gap:12px;margin-top:26px}
+.bullets li{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.bullets .ic{flex:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.06);font-size:17px}
+.bullets b{display:block;font-family:var(--f-head);font-weight:600}
+.bullets span{color:var(--muted);font-size:15px}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:70px}
+.stat{padding:30px 24px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--line);text-align:center}
+.stat .num{font-family:var(--f-display);font-weight:900;font-size:clamp(34px,4vw,48px);line-height:1.1}
+.stat .lbl{color:var(--muted);margin-top:8px;font-size:15px}
+.note{text-align:center;color:var(--dim);font-family:var(--f-mono);font-size:12px;margin-top:16px}
+
+/* portfólio */
+.tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:36px}
+.tab{display:flex;align-items:center;gap:10px;height:50px;padding:0 18px 0 6px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-family:var(--f-head);font-weight:600;font-size:15px;transition:all .2s}
+.tab img{width:38px;height:38px;border-radius:50%}
+.tab.all{padding:0 22px}
+.tab small{font-family:var(--f-mono);font-weight:400;font-size:12px;color:var(--dim)}
+.tab:hover{color:var(--text);border-color:var(--line-2)}
+.tab[aria-selected="true"]{background:#fff;color:#0a0a0c;border-color:#fff}
+.tab[aria-selected="true"] small{color:#555}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{display:flex;flex-direction:column;text-align:left;border-radius:20px;overflow:hidden;background:var(--surface);border:1px solid var(--line);transition:transform .25s,border-color .25s;animation:fadeUp .45s both}
+.card:hover{transform:translateY(-4px);border-color:var(--line-2)}
+.thumb{position:relative;aspect-ratio:16/9;overflow:hidden;background:#111}
+.thumb img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.card:hover .thumb img{transform:scale(1.05)}
+.play{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.55))}
+.play i{width:62px;height:62px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;transform:scale(.9);transition:transform .25s;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.play i::after{content:"";margin-left:4px;border-left:17px solid #0a0a0c;border-top:11px solid transparent;border-bottom:11px solid transparent}
+.card:hover .play i{transform:scale(1)}
+.badge{position:absolute;top:12px;left:12px;font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;padding:5px 10px;border-radius:999px;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.15)}
+.card-body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px;flex:1}
+.card-body h3{font-family:var(--f-head);font-weight:600;font-size:16.5px;line-height:1.35}
+.card-owner{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13.5px;margin-top:auto}
+.card-owner img{width:22px;height:22px;border-radius:50%}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}}
+
+/* recenzia */
+.review{max-width:860px;margin:0 auto;padding:54px;border-radius:28px;background:var(--surface);border:1px solid var(--line);text-align:center;position:relative;overflow:hidden}
+.review::before{content:"“";position:absolute;top:-30px;left:30px;font-family:var(--f-head);font-size:220px;line-height:1;color:rgba(255,255,255,.05)}
+.stars{color:#fff;letter-spacing:4px;font-size:20px}
+.verified{display:inline-block;margin-left:10px;font-family:var(--f-mono);font-size:12px;color:var(--green);letter-spacing:0;vertical-align:middle}
+.review blockquote{font-family:var(--f-head);font-weight:500;font-size:clamp(22px,3vw,32px);line-height:1.35;margin:24px 0 30px}
+.review .who{display:inline-flex;align-items:center;gap:14px;text-align:left}
+.review .who img{width:56px;height:56px;border-radius:50%;box-shadow:0 0 0 2px rgba(255,255,255,.25)}
+.review .who b{font-family:var(--f-head);display:block}
+.review .who span{color:var(--muted);font-size:14px}
+
+/* služby */
+.services{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.svc{padding:34px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--line);transition:border-color .25s,transform .25s;position:relative;overflow:hidden}
+.svc:hover{border-color:var(--line-2);transform:translateY(-3px)}
+.svc .n{position:absolute;top:26px;right:30px;font-family:var(--f-display);font-weight:900;font-size:44px;color:rgba(255,255,255,.05)}
+.svc .ic{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-size:24px;background:rgba(255,255,255,.06);border:1px solid var(--line);margin-bottom:22px}
+.svc h3{font-family:var(--f-head);font-weight:700;font-size:23px;margin-bottom:10px}
+.svc p{color:var(--muted)}
+.svc .out{margin-top:18px;font-family:var(--f-mono);font-size:13px;color:#d4d4dc}
+
+/* proces */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;counter-reset:s}
+.step{padding:28px 24px;border-radius:var(--radius);border:1px solid var(--line);background:linear-gradient(180deg,var(--surface),transparent)}
+.step::before{counter-increment:s;content:"0" counter(s);font-family:var(--f-display);font-weight:900;font-size:28px;display:block;margin-bottom:14px;background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+.step h3{font-family:var(--f-head);font-weight:600;font-size:19px;margin-bottom:6px}
+.step p{color:var(--muted);font-size:15px}
+
+/* faq */
+.faq{max-width:820px;margin:0 auto;display:grid;gap:12px}
+.faq details{border-radius:18px;background:var(--surface);border:1px solid var(--line);transition:border-color .2s}
+.faq details[open]{border-color:var(--line-2)}
+.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px 26px;font-family:var(--f-head);font-weight:600;font-size:18px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";flex:none;width:32px;height:32px;border-radius:50%;border:1px solid var(--line-2);display:grid;place-items:center;font-size:20px;font-weight:400;transition:transform .25s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{padding:0 26px 24px;color:var(--muted)}
+
+/* kontakt */
+.contact{display:grid;grid-template-columns:1fr 1.1fr;gap:24px}
+.contact>*,.row>*{min-width:0}
+.panel{padding:40px;border-radius:28px;background:var(--surface);border:1px solid var(--line)}
+.panel h3{font-family:var(--f-head);font-weight:700;font-size:30px;line-height:1.15;margin:20px 0 14px}
+.panel > p{color:var(--muted)}
+.mail{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:28px;padding:10px 10px 10px 20px;border-radius:999px;border:1px solid var(--line-2);background:rgba(255,255,255,.03);font-family:var(--f-mono);font-size:15px;min-width:0}
+.mail a{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mail button{flex:none;height:40px;padding:0 16px;border-radius:999px;background:rgba(255,255,255,.08);font-family:var(--f-head);font-weight:600;font-size:14px}
+.mail button:hover{background:rgba(255,255,255,.14)}
+.facts{display:grid;gap:12px;margin-top:26px;color:var(--muted);font-size:15px}
+.facts div{display:flex;gap:12px;align-items:center}
+form{display:grid;gap:16px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+label{display:grid;gap:8px;font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+input,textarea,select{font:inherit;font-family:var(--f-body);font-size:16px;letter-spacing:0;text-transform:none;color:var(--text);background:#0a0a0d;border:1px solid var(--line-2);border-radius:14px;padding:14px 16px;transition:border-color .2s,box-shadow .2s;width:100%}
+select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,#999 50%),linear-gradient(135deg,#999 50%,transparent 50%);background-position:calc(100% - 22px) 50%,calc(100% - 16px) 50%;background-size:6px 6px;background-repeat:no-repeat}
+textarea{min-height:140px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:none;border-color:rgba(255,255,255,.4);box-shadow:0 0 0 4px rgba(255,255,255,.06)}
+form .btn{width:100%;margin-top:4px}
+.form-msg{font-size:15px;min-height:1.4em;text-align:center}
+.form-msg.ok{color:var(--green)}.form-msg.err{color:#f87171}
+
+/* pätička */
+footer{border-top:1px solid var(--line);padding:40px 0 50px;margin-top:40px}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;color:var(--dim);font-size:14px}
+.foot nav{display:flex;gap:20px;flex-wrap:wrap}
+.foot nav a:hover{color:var(--text)}
+
+/* modal s videom */
+.modal{position:fixed;inset:0;z-index:100;display:none;place-items:center;padding:20px;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.modal.open{display:grid}
+.modal-box{position:relative;width:min(1100px,100%)}
+.modal-box.short{width:min(420px,100%)}
+.modal iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:18px;background:#000}
+.modal-box.short iframe{aspect-ratio:9/16;max-height:85vh}
+.modal-close{position:absolute;top:-56px;right:0;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.1);font-size:22px}
+
+/* scroll animácie */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media (max-width:980px){
+  .nav-links{display:none}
+  .burger{display:block}
+  .nav{border-radius:28px;flex-wrap:wrap;height:auto;min-height:68px;padding:10px 10px 10px 22px}
+  .nav.open{background:rgba(12,12,15,.97)}
+  .nav.open .nav-links{display:flex;flex-direction:column;width:100%;padding:8px 0 12px;order:3}
+  .nav.open .nav-links a{padding:14px 16px;font-size:17px}
+  .nav .btn{display:none}
+  .about-grid{grid-template-columns:1fr}
+  .me{max-width:460px;margin:0 auto;width:100%}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .contact{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  section{padding:80px 0}
+  .hero{padding-top:140px}
+  .hero-ctas .btn{width:100%}
+  .chips{flex-direction:column;gap:10px}
+  .reel-frame{padding:6px;border-radius:20px}
+  .reel-frame video{border-radius:15px}
+  .reel-ctrl{position:static;justify-content:center;padding:12px 0 6px}
+  .reel-ctrl button{height:40px;padding:0 16px;font-size:14px}
+  .tabs{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;margin-inline:-16px;padding:0 16px 6px;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:none}
+  .grid,.services,.steps,.row{grid-template-columns:1fr}
+  .stats{gap:12px}
+  .stat{padding:22px 14px}
+  .review{padding:40px 24px}
+  .panel{padding:28px 22px}
+  .svc{padding:28px 24px}
+  .faq summary{padding:18px 20px;font-size:17px}
+  .faq details p{padding:0 20px 20px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"><div class="bg-grid"></div><div class="bg-glow"></div></div>
+
+<header class="nav" id="nav">
+  <a href="#top" class="logo" aria-label="ZYFONIX – domov"><span class="logo-mark">Z</span>ZYFONIX</a>
+  <nav class="nav-links" aria-label="Hlavná navigácia">
+    <a href="#o-mne">O mne</a>
+    <a href="#portfolio">Portfólio</a>
+    <a href="#recenzie">Recenzie</a>
+    <a href="#sluzby">Služby</a>
+    <a href="#faq">FAQ</a>
+    <a href="#kontakt">Kontakt</a>
+  </nav>
+  <a href="#kontakt" class="btn btn-primary">Spolupráca ↗</a>
+  <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+</header>
+
+<main id="top">
+  <!-- HERO -->
+  <section class="hero" id="domov">
+    <div class="wrap">
+      <div class="status"><span class="dot"></span>Aktuálne voľné miesto pre 1–2 nových klientov</div>
+      <h1 class="chrome">ZYFONIX</h1>
+      <div class="role"><b>Video Editor</b> pre tvorcov &amp; influencerov</div>
+      <p class="desc">Tvorím dynamické a kvalitne spracované videá, ktoré zaujmú už od prvých sekúnd. Pútavý strih, správne tempo a detaily, ktoré udržia pozornosť divákov, zvýšia Watch Time a posunú tvoj kanál ďalej.</p>
+      <div class="hero-ctas">
+        <a href="#portfolio" class="btn btn-primary">Pozri moje práce ↓</a>
+        <a href="#kontakt" class="btn btn-ghost">Začať spoluprácu</a>
+      </div>
+      <div class="chips">
+        <span>✓ <b>781K+</b> organických videní</span>
+        <span>✓ <b>1.5M+</b> dosah klientov</span>
+        <span>✓ <b>YouTube, Shorts &amp; Reels</b></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHOWREEL -->
+  <div class="reel">
+    <div class="wrap reveal">
+      <div class="reel-frame">
+        <video id="reel" src="assets/promo.mp4" poster="assets/poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="ZYFONIX promo video"></video>
+        <div class="reel-ctrl">
+          <button id="reelPlay" aria-label="Pozastaviť video">❚❚ Pauza</button>
+          <button id="reelSound" aria-label="Zapnúť zvuk">🔇 Zapnúť zvuk</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KLIENTI -->
+  <div class="trust">
+    <div class="eyebrow">Dôverujú mi poprední CZ/SK tvorcovia</div>
+    <div class="marquee"><div class="marquee-track" id="marquee"></div></div>
+  </div>
+
+  <!-- O MNE -->
+  <section id="o-mne">
+    <div class="wrap">
+      <div class="about-grid">
+        <div class="me reveal">
+          <img src="assets/zyfonix.jpg" alt="Zyfonix" width="200" height="200" loading="lazy">
+          <h3>ZYFONIX</h3>
+          <div class="sub">Video Editor</div>
+          <div class="tags">
+            <span class="tag">Premiere Pro</span>
+            <span class="tag">16:9 &amp; 9:16</span>
+            <span class="tag">Watch Time &amp; retencia</span>
+            <span class="tag">Sound design</span>
+          </div>
+        </div>
+        <div class="about-text reveal">
+          <div class="eyebrow">O mne</div>
+          <h2 class="h2">Strih, ktorý udrží <span class="chrome">divákov</span> pri obrazovke</h2>
+          <p>Strihu videí sa venujem <b>viac ako rok</b> a mám za sebou spolupráce s väčšími CZ/SK tvorcami. Každý tvorca má vlastný štýl, preto každé video spracujem tak, aby ti sedelo a divákov bavilo sledovať.</p>
+          <p>Robím krátke aj dlhé videá, jednorazové projekty aj dlhodobé spolupráce. Pracujem s hudbou, zvukovými efektmi, animáciami, titulkami a farbami.</p>
+          <ul class="bullets">
+            <li><span class="ic">⚡</span><div><b>Silný začiatok</b><span>Prvé sekundy rozhodujú – hook, ktorý upúta pozornosť.</span></div></li>
+            <li><span class="ic">🎯</span><div><b>Dynamický strih</b><span>Bez hluchých miest, so správnym tempom až do konca.</span></div></li>
+            <li><span class="ic">🤝</span><div><b>Férová spolupráca</b><span>Rýchla komunikácia a úpravy, kým nie si spokojný.</span></div></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat reveal"><div class="num chrome" data-count="781" data-suffix="K+">0</div><div class="lbl">organických videní</div></div>
+        <div class="stat reveal"><div class="num chrome" data-count="1.5" data-dec="1" data-suffix="M+">0</div><div class="lbl">dosah klientov</div></div>
+        <div class="stat reveal"><div class="num chrome" data-count="22" data-suffix="+">0</div><div class="lbl">dokončených projektov</div></div>
+        <div class="stat reveal"><div class="num chrome" data-count="1" data-suffix="+">0</div><div class="lbl">rok skúseností</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PORTFÓLIO -->
+  <section id="portfolio">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="eyebrow">Portfólio</div>
+        <h2 class="h2">Moje práce &amp; klienti</h2>
+        <p class="lead">Vyber si tvorcu a pozri si videá, na ktorých som pracoval. Kliknutím sa video prehrá priamo tu.</p>
+      </div>
+      <div class="tabs" role="tablist" id="tabs"></div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <!-- RECENZIE -->
+  <section id="recenzie">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="eyebrow">Recenzie</div>
+        <h2 class="h2">Čo hovoria klienti</h2>
+      </div>
+      <figure class="review reveal">
+        <div class="stars">★★★★★<span class="verified">✓ Overená spolupráca</span></div>
+        <blockquote>„Kvalitní edit, jsem velmi spokojený. Doporučuji každému, kdo hledá spolehlivého editora!“</blockquote>
+        <figcaption class="who">
+          <img src="assets/avatars/skyf.jpg" alt="" width="56" height="56" loading="lazy">
+          <div><b>Skyf</b><span>132K+ odberateľov · YouTube</span></div>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- SLUŽBY -->
+  <section id="sluzby">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="eyebrow">Služby</div>
+        <h2 class="h2">Čo ponúkam</h2>
+        <p class="lead">Kompletná postprodukcia prispôsobená tvojmu štýlu a tomu, čo funguje v algoritme.</p>
+      </div>
+      <div class="services">
+        <article class="svc reveal"><span class="n">01</span><div class="ic">✂️</div><h3>Strih videí</h3><p>Dynamický strih pre YouTube, Instagram a TikTok, ktorý drží pozornosť diváka od úvodného hooku až po záver.</p><div class="out">→ vyšší Watch Time &amp; miera dopozerania</div></article>
+        <article class="svc reveal"><span class="n">02</span><div class="ic">🎨</div><h3>Color grading</h3><p>Farebná korekcia pre filmový alebo vlastný vizuálny look, ktorý odlíši tvoje videá od konkurencie.</p><div class="out">→ prémiový a konzistentný vizuál</div></article>
+        <article class="svc reveal"><span class="n">03</span><div class="ic">✨</div><h3>Prechody, titulky &amp; efekty</h3><p>Plynulé prechody, dynamické titulky, sound design a efekty, ktoré dodajú videu spád a energiu.</p><div class="out">→ žiadne nudné ani hluché pasáže</div></article>
+        <article class="svc reveal"><span class="n">04</span><div class="ic">🤝</div><h3>Dlhodobá spolupráca</h3><p>Pravidelný strih tvojho obsahu s pochopením tvojho publika. Ušetrím ti desiatky hodín a tvoj podpis zostane zachovaný.</p><div class="out">→ viac času na natáčanie a nové nápady</div></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCES -->
+  <section id="proces">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="eyebrow">Ako to funguje</div>
+        <h2 class="h2">Od záznamu k hotovému videu</h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal"><h3>Napíšeš mi</h3><p>Cez formulár, e-mail alebo Instagram. Dohodneme štýl, rozsah a termín.</p></div>
+        <div class="step reveal"><h3>Pošleš záznamy</h3><p>Raw zábery mi jednoducho pošleš napríklad cez Google Drive.</p></div>
+        <div class="step reveal"><h3>Strihám</h3><p>Shorts väčšinou do 24–48 hodín, dlhšie videá do pár dní podľa dohody.</p></div>
+        <div class="step reveal"><h3>Úpravy &amp; hotovo</h3><p>Čokoľvek ti nesedí, upravím – kým nie je video presne podľa tvojich predstáv.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="eyebrow">FAQ</div>
+        <h2 class="h2">Často kladené otázky</h2>
+      </div>
+      <div class="faq reveal">
+        <details open><summary>Ako rýchlo dodáš hotové video?</summary><p>Krátke videá (Shorts) mám väčšinou hotové do 24–48 hodín. Pri dlhších YouTube videách záleží na dĺžke záznamu a náročnosti strihu – väčšinou ich dodám do pár dní, podľa dohody.</p></details>
+        <details><summary>Aké typy videí upravuješ?</summary><p>IRL videá, gaming, vlogy a ďalšie. Strihám aj krátke videá na YouTube Shorts, Instagram Reels a TikTok. Každé video prispôsobím tvojmu štýlu, aby čo najviac zaujalo tvojich divákov.</p></details>
+        <details><summary>Čo ak budem chcieť vo videu niečo upraviť?</summary><p>Stačí mi napísať. Úpravy v pohode spravím, aby bolo výsledné video podľa tvojich predstáv.</p></details>
+        <details><summary>Ako prebieha posielanie záznamov a komunikácia?</summary><p>Komunikovať môžeme cez Instagram alebo e-mail. Raw záznamy mi pošleš napríklad cez Google Drive, potom začnem strihať a priebežne sa dohodneme na detailoch.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- KONTAKT -->
+  <section id="kontakt">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="eyebrow">Kontakt</div>
+        <h2 class="h2">Začnime <span class="chrome">spolupracovať</span></h2>
+        <p class="lead">Chceš posunúť svoje videá na vyšší level? Napíš mi pár viet o svojom projekte a dohodneme detaily.</p>
+      </div>
+      <div class="contact">
+        <div class="panel reveal">
+          <div class="status"><span class="dot"></span>Odpovedám zvyčajne do 24 hodín</div>
+          <h3>Poďme vytvoriť niečo veľké</h3>
+          <p>Či hľadáš editora na jednorazový projekt alebo dlhodobého partnera pre svoj kanál – napíš mi.</p>
+          <div class="mail"><a href="mailto:zyfonix.collab@gmail.com">zyfonix.collab@gmail.com</a><button id="copy" type="button">Kopírovať</button></div>
+          <div class="facts">
+            <div>⏱️ Shorts do 24–48 hodín</div>
+            <div>🎬 YouTube, Shorts, Reels &amp; TikTok</div>
+            <div>📁 Záznamy cez Google Drive</div>
+          </div>
+        </div>
+        <div class="panel reveal">
+          <form id="form" action="https://formspree.io/f/xwvaqpjr" method="POST">
+            <div class="row">
+              <label>Meno / kanál<input name="meno" required autocomplete="name"></label>
+              <label>E-mail<input name="email" type="email" required autocomplete="email"></label>
+            </div>
+            <label>Typ projektu
+              <select name="typ">
+                <option>Dlhé YouTube video</option>
+                <option>Shorts / Reels / TikTok</option>
+                <option>Dlhodobá spolupráca</option>
+                <option>Iné</option>
+              </select>
+            </label>
+            <label>Správa<textarea name="sprava" required placeholder="Pár slov o tvojom kanáli a čo potrebuješ…"></textarea></label>
+            <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+            <button class="btn btn-primary" type="submit">Odoslať správu →</button>
+            <div class="form-msg" id="formMsg" role="status"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <a href="#top" class="logo"><span class="logo-mark">Z</span>ZYFONIX</a>
+    <nav><a href="#portfolio">Portfólio</a><a href="#sluzby">Služby</a><a href="#faq">FAQ</a><a href="mailto:zyfonix.collab@gmail.com">E-mail</a></nav>
+    <span>© 2026 Zyfonix. Všetky práva vyhradené.</span>
+  </div>
+</footer>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Prehrávač videa">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" id="modalClose" aria-label="Zavrieť">✕</button>
+    <iframe id="player" title="YouTube video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+  </div>
+</div>
+
+<script>
+// Klienti zoradení podľa počtu odberateľov
+const CLIENTS = [
+  { key: 'mgfitman', name: 'MGFitman', subs: '854K+', url: 'https://www.youtube.com/@MGFitman', img: 'mgfitman.jpg',
+    videos: [['bgl_agnHtB8', 'Kdo má lepší BICÁK?', true]] },
+  { key: 'mgfitman_gaming', name: 'MGFitman Gaming', subs: '330K+', url: 'https://www.youtube.com/@MGFitmanGaming', img: 'mgfitman_gaming.jpg',
+    videos: [['DIyRSMtodbk', 'SUPERCELL MĚ SLYŠÍ', true]] },
+  { key: 'skyf', name: 'Skyf', subs: '132K+', url: 'https://www.youtube.com/@SkyfCS', img: 'skyf.jpg',
+    videos: [
+      ['2RMiRz7Ii-s', 'Otvírám CS2 Caseky dokud mi nepadne KNIFE + drunk stream w/Tynka'],
+      ['KQqVkijipns', 'Takhle jsem získal AK-47 Gold Arabesque za 3 000€'],
+      ['jQnfpU_3w2k', 'Udělal jsem první drunk stream a tohle se stalo...'],
+      ['qNmnKavN0T0', 'Hrál jsem proti FAKE Čechovi?! | Road to 30 000 Elo premier'],
+    ] },
+  { key: 'twiler', name: 'TwileR', subs: '112K+', url: 'https://www.youtube.com/channel/UCvT293-aCO9EbKaPJM3tA7Q', img: 'twiler.jpg',
+    videos: [
+      ['4Rz7DuQ-DWc', 'Stal som sa ZLODEJOM na MOJEJ PUMPE! (VR)'],
+      ['CEyNgN4ZDEU', 'Pracujem ako NAJHORŠÍ Upratovač v KLUBE! (VR)'],
+      ['hHfmAIHzPbs', '24 Hodín PRANKUJEM Svoju FRAJERKU!'],
+      ['M9prHH3ZEso', 'Postavil som si VYSNÍVANÝ Herný SETUP!'],
+      ['P53UfE47dpA', 'Zasekol Som sa vo VÝŤAHU! (VR)'],
+      ['wGilG9XkTBw', '24 Hodín IGNORUJEM Moju FRAJERKU!'],
+      ['XtgxWVS1Ybc', 'Ak sa Zasmeješ, Musíš Zjesť PÁLIVY CHIPS!'],
+      ['A9ZJPDW3mnU', '24 Hodín Trénujem MMA ale Večer mám ZÁPAS!'],
+    ] },
+  { key: 'stepsirl', name: 'Štěps IRL', subs: '37,5K+', url: 'https://www.youtube.com/channel/UCuQwP1mNT0Nl0LBu4tSXhgw', img: 'stepsirl.jpg', videos: [] },
+  { key: 'capygod', name: 'CapyGod', subs: '19,3K+', url: 'https://www.youtube.com/@CapyGod_YT', img: 'capygod.jpg', videos: [] },
+  { key: 'nardosk', name: 'Nardosk', subs: '4,1K+', url: 'https://www.youtube.com/@Nardosk1', img: 'nardosk.jpg',
+    videos: [['0Ai8a5fje-o', 'MAL SOM 24 HODÍN NA TO, ABY SOM ZAŽIL VŠETKO']] },
+];
+const av = c => `assets/avatars/${c.img}`;
+const esc = s => s.replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+
+// marquee – zoznam 2× za sebou pre plynulú slučku
+const pills = CLIENTS.map(c => `<a class="pill" href="${c.url}" target="_blank" rel="noopener"><img src="${av(c)}" alt="" width="48" height="48"><b>${esc(c.name)}</b><span>${c.subs}</span></a>`).join('');
+document.getElementById('marquee').innerHTML = pills + pills.replace(/<a /g, '<a aria-hidden="true" tabindex="-1" ');
+
+// portfólio
+const withVideos = CLIENTS.filter(c => c.videos.length);
+const allVideos = withVideos.flatMap(c => c.videos.map(v => ({ id: v[0], title: v[1], short: !!v[2], c })));
+const tabs = document.getElementById('tabs'), grid = document.getElementById('grid');
+tabs.innerHTML = `<button class="tab all" role="tab" data-k="all" aria-selected="true">Všetko <small>${allVideos.length}</small></button>` +
+  withVideos.map(c => `<button class="tab" role="tab" data-k="${c.key}" aria-selected="false"><img src="${av(c)}" alt="" width="38" height="38">${esc(c.name)} <small>${c.videos.length}</small></button>`).join('');
+
+function renderGrid(k) {
+  const list = k === 'all' ? allVideos : allVideos.filter(v => v.c.key === k);
+  grid.innerHTML = list.map((v, i) => `
+    <button class="card" data-id="${v.id}" data-short="${v.short}" style="animation-delay:${Math.min(i, 8) * 50}ms">
+      <div class="thumb"><img src="https://i.ytimg.com/vi/${v.id}/hqdefault.jpg" alt="" loading="lazy"><span class="badge">${v.short ? 'YT SHORT' : 'YOUTUBE'}</span><span class="play"><i></i></span></div>
+      <div class="card-body"><h3>${esc(v.title)}</h3><div class="card-owner"><img src="${av(v.c)}" alt="" width="22" height="22">${esc(v.c.name)} · ${v.c.subs}</div></div>
+    </button>`).join('');
+}
+tabs.addEventListener('click', e => {
+  const b = e.target.closest('.tab'); if (!b) return;
+  tabs.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', t === b));
+  renderGrid(b.dataset.k);
+});
+renderGrid('all');
+
+// prehrávač
+const modal = document.getElementById('modal'), player = document.getElementById('player'), box = document.getElementById('modalBox');
+const reel = document.getElementById('reel');
+let reelWasPlaying = false;
+grid.addEventListener('click', e => {
+  const c = e.target.closest('.card'); if (!c) return;
+  box.classList.toggle('short', c.dataset.short === 'true');
+  player.src = `https://www.youtube-nocookie.com/embed/${c.dataset.id}?autoplay=1&rel=0`;
+  reelWasPlaying = !reel.paused; reel.pause();
+  modal.classList.add('open'); document.getElementById('modalClose').focus();
+});
+function closeModal() { modal.classList.remove('open'); player.src = ''; if (reelWasPlaying) reel.play(); }
+document.getElementById('modalClose').onclick = closeModal;
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
+
+// showreel ovládanie
+const rp = document.getElementById('reelPlay'), rs = document.getElementById('reelSound');
+rp.onclick = () => { reel.paused ? reel.play() : reel.pause(); };
+reel.addEventListener('play', () => { rp.textContent = '❚❚ Pauza'; rp.setAttribute('aria-label', 'Pozastaviť video'); });
+reel.addEventListener('pause', () => { rp.textContent = '▶ Prehrať'; rp.setAttribute('aria-label', 'Prehrať video'); });
+rs.onclick = () => {
+  reel.muted = !reel.muted;
+  if (!reel.muted) { reel.currentTime = 0; reel.play(); }
+  rs.textContent = reel.muted ? '🔇 Zapnúť zvuk' : '🔊 Vypnúť zvuk';
+  rs.setAttribute('aria-label', reel.muted ? 'Zapnúť zvuk' : 'Vypnúť zvuk');
+};
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) reel.pause();
+
+// mobilné menu
+const nav = document.getElementById('nav'), burger = document.getElementById('burger');
+burger.onclick = () => { const o = nav.classList.toggle('open'); burger.setAttribute('aria-expanded', o); };
+nav.querySelectorAll('.nav-links a').forEach(a => a.addEventListener('click', () => { nav.classList.remove('open'); burger.setAttribute('aria-expanded', false); }));
+
+// aktívna sekcia v menu
+const links = [...nav.querySelectorAll('.nav-links a')];
+const secObs = new IntersectionObserver(es => es.forEach(en => {
+  if (en.isIntersecting) links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + en.target.id));
+}), { rootMargin: '-45% 0px -50% 0px' });
+document.querySelectorAll('section[id]').forEach(s => secObs.observe(s));
+
+// animácie pri scrollovaní + napočítavanie čísel
+function countUp(el) {
+  const to = parseFloat(el.dataset.count), dec = +(el.dataset.dec || 0), suf = el.dataset.suffix || '', t0 = performance.now(), d = 1600;
+  (function tick(now) {
+    const p = Math.min(1, (now - t0) / d), e = 1 - Math.pow(1 - p, 3);
+    el.textContent = (to * e).toFixed(dec) + suf;
+    if (p < 1) requestAnimationFrame(tick);
+  })(t0);
+}
+const io = new IntersectionObserver(es => es.forEach(en => {
+  if (!en.isIntersecting) return;
+  en.target.classList.add('in');
+  en.target.querySelectorAll('[data-count]').forEach(countUp);
+  io.unobserve(en.target);
+}), { threshold: .15 });
+document.querySelectorAll('.reveal').forEach((el, i) => { el.style.transitionDelay = (i % 4) * 70 + 'ms'; io.observe(el); });
+
+// kopírovanie e-mailu
+document.getElementById('copy').onclick = async e => {
+  try { await navigator.clipboard.writeText('zyfonix.collab@gmail.com'); e.target.textContent = 'Skopírované ✓'; }
+  catch { e.target.textContent = 'Nepodarilo sa'; }
+  setTimeout(() => e.target.textContent = 'Kopírovať', 2000);
+};
+
+// formulár cez Formspree bez opustenia stránky
+const form = document.getElementById('form'), msg = document.getElementById('formMsg');
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = form.querySelector('button[type=submit]');
+  btn.disabled = true; btn.textContent = 'Odosielam…'; msg.className = 'form-msg'; msg.textContent = '';
+  try {
+    const r = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+    if (!r.ok) throw 0;
+    form.reset(); msg.className = 'form-msg ok'; msg.textContent = 'Správa odoslaná! Ozvem sa ti zvyčajne do 24 hodín.';
+  } catch {
+    msg.className = 'form-msg err'; msg.textContent = 'Niečo sa pokazilo. Napíš mi prosím priamo na zyfonix.collab@gmail.com.';
+  }
+  btn.disabled = false; btn.textContent = 'Odoslať správu →';
+});
+</script>
+</body>
+</html>
